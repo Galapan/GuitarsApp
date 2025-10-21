@@ -25,6 +25,7 @@ const createDiv = (guitar) => {
     return div
 }
 
+
 const createCart = (carrito) => {
     const p = '<p class="text-center">El carrito esta vacio</p>'
     let total = 0
