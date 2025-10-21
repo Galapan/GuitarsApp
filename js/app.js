@@ -1,6 +1,7 @@
 import { db } from './guitarras.js'
 
 const divContainer = document.querySelector('main div')
+const carritoContainer = document.querySelector('#carrito')
 const carrito = []
 
 const createDiv = (guitar) => {
@@ -24,8 +25,66 @@ const createDiv = (guitar) => {
     return div
 }
 
+const createCart = (carrito) => {
+    const p = '<p class="text-center">El carrito esta vacio</p>'
+    let total = 0
+    let html = `<table class="w-100 table">
+                                <thead>
+                                    <tr>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>`
+    carrito.forEach(g => {
+        total += g.precio * g.cantidad
+        html += `<tr>
+                                        <td>
+                                            <img class="img-fluid" src="./img/${g.imagen}.jpg" alt="imagen guitarra">
+                                        </td>
+                                        <td>${g.nombre}</td>
+                                        <td class="fw-bold">
+                                                ${g.precio}
+                                        </td>
+                                        <td class="flex align-items-start gap-4">
+                                            <button
+                                                type="button"
+                                                class="btn btn-dark"
+                                            >-</button>
+                                                ${g.cantidad}
+                                            <button
+                                                type="button"
+                                                class="btn btn-dark"
+                                            >+</button>
+                                        </td>
+                                        <td>
+                                            <button
+                                                class="btn btn-danger"
+                                                type="button"
+                                            >
+                                                X
+                                            </button>
+                                        </td>
+                                    </tr>`
+    })
 
-//Utilizando itireadores
+    html += `</tbody>
+                </table>
+
+                            <p class="text-end">Total pagar: <span class="fw-bold">$${total}</span></p>
+                            <button class="btn btn-dark w-100 mt-3 p-2">Vaciar Carrito</button>`
+    if(carrito.length === 0){
+        carritoContainer.innerHTML = p
+    } else{
+        carritoContainer.innerHTML = html
+    }
+}
+
+
+//Utilizando iteradores
 db.forEach(guitar =>{
     divContainer.appendChild(createDiv(guitar))
 })
@@ -35,17 +94,20 @@ const cardClicked = (e) => {
         //console.log('Le diste al botón', e.target.getAttribute('data-id'))
         const idGuitar = Number(e.target.getAttribute('data-id'))
         //const indexdb = db.findIndex(guitar => guitar.id === Number(idGuitar))
-        if(!carrito.some(g => g.id === idGuitar)){
+        const idxGuitar = carrito.findIndex(g => g.id === idGuitar)
+        if(idxGuitar === -1){
             carrito.push({    
                 ...db[idGuitar - 1],
                 cantidad: 1
             })
         } else{
-            const idCarrito = carrito.findIndex(g => g.id === idGuitar)
-            const currentGuitar = carrito [idCarrito]
-            currentGuitar.cantidad++
+            carrito[idxGuitar].cantidad++
         }
         console.log(carrito)
+        createCart(carrito)
     }
 }
+
+createCart(carrito)
+
 divContainer.addEventListener('click', cardClicked)
