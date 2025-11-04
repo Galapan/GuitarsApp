@@ -2,7 +2,7 @@ import { db } from './guitarras.js'
 
 const divContainer = document.querySelector('main div')
 const carritoContainer = document.querySelector('#carrito')
-const carrito = []
+let carrito = []
 
 const createDiv = (guitar) => {
     const div = document.createElement('div')
@@ -42,7 +42,7 @@ const createCart = (carrito) => {
                                 <tbody>`
     carrito.forEach(g => {
         total += g.precio * g.cantidad
-        html += `<tr>
+        html += `<tr data-id="${g.id}">
                                         <td>
                                             <img class="img-fluid" src="./img/${g.imagen}.jpg" alt="imagen guitarra">
                                         </td>
@@ -65,9 +65,7 @@ const createCart = (carrito) => {
                                             <button
                                                 class="btn btn-danger"
                                                 type="button"
-                                            >
-                                                X
-                                            </button>
+                                            >X</button>
                                         </td>
                                     </tr>`
     })
@@ -85,10 +83,34 @@ const createCart = (carrito) => {
 }
 
 
-//Utilizando iteradores
 db.forEach(guitar =>{
     divContainer.appendChild(createDiv(guitar))
 })
+
+const carritcoClicked = (e) => {
+    if(e.target.classList.contains('btn')){
+        const btn = e.target.innerText
+        const idCarrito = e.target
+            .parentElement
+            .parentElement.getAttribute('data-id')
+        const idxCarrito = carrito
+            .findIndex(g => g.id === Number(idCarrito))
+        if(btn === '-'){
+            if(carrito[idxCarrito].cantidad > 1){
+                carrito[idxCarrito].cantidad--
+            }
+        } else if(btn === '+') {
+            if(carrito[idxCarrito].cantidad < 10){
+                carrito[idxCarrito].cantidad++
+            }    
+        } else if(btn === 'X'){
+            carrito = carrito.filter(g => g.id !== Number(idCarrito))
+        } else if (btn === 'VACIAR CARRITO'){
+            carrito = []
+        }
+        createCart(carrito)
+    }
+}
 
 const cardClicked = (e) => {
     if(e.target.classList.contains('btn')){
@@ -112,3 +134,4 @@ const cardClicked = (e) => {
 createCart(carrito)
 
 divContainer.addEventListener('click', cardClicked)
+carritoContainer.addEventListener('click', carritcoClicked) 
